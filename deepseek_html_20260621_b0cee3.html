@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gráficos Lineares · Prof. Giovanelli</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: #0b1120;
+            color: #e2e8f0;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 12px;
+        }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            border: 1px solid #1e293b;
+        }
+        @keyframes pulseGlow {
+            0%,
+            100% {
+                opacity: 0.6;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+        .coef-highlight {
+            transition: all 0.3s ease;
+        }
+        .coef-highlight:hover {
+            transform: scale(1.05);
+            background: rgba(251, 191, 36, 0.15);
+        }
+        .equation-display {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-slate-900/90 border-b border-slate-800 px-4 py-3 sticky top-0 z-30 backdrop-blur-sm">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-3">
+                <i data-lucide="trending-up" class="w-7 h-7 text-amber-400"></i>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-white">Gráficos Lineares</h1>
+                    <p class="text-[11px] text-amber-400 font-semibold tracking-wider uppercase">Prof. Giovanelli · Função Afim</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-slate-800/60 px-3 py-1.5 rounded-full text-xs text-slate-300 border border-slate-700/40">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                Coeficientes dinâmicos
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN -->
+    <main class="max-w-7xl mx-auto p-3 md:p-5 w-full flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- PAINEL DE CONTROLE (esquerda) -->
+        <section class="lg:col-span-4 flex flex-col gap-4 glass-panel p-4 rounded-2xl shadow-xl">
+            <h2 class="text-md font-semibold border-b border-slate-800 pb-2 text-slate-200 flex items-center gap-2">
+                <i data-lucide="settings" class="w-5 h-5 text-amber-500"></i> Controles
+            </h2>
+
+            <!-- Equação em destaque -->
+            <div class="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60 text-center">
+                <span class="text-xs text-slate-400 font-medium">FUNÇÃO AFIM</span>
+                <div class="text-2xl font-bold text-amber-300 equation-display mt-1">
+                    f(x) = <span id="coef-a-display" class="text-amber-400">1.00</span>x <span id="coef-b-sign" class="text-emerald-400">+</span> <span id="coef-b-display" class="text-emerald-400">0.00</span>
+                </div>
+                <div class="flex justify-center gap-6 mt-2 text-xs text-slate-400">
+                    <span>Coeficiente angular: <span id="a-label" class="text-amber-400 font-semibold">a = 1.00</span></span>
+                    <span>Coeficiente linear: <span id="b-label" class="text-emerald-400 font-semibold">b = 0.00</span></span>
+                </div>
+            </div>
+
+            <!-- Controles dos coeficientes -->
+            <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800/60 space-y-4">
+                <!-- Coeficiente a (angular) -->
+                <div class="coef-highlight p-2 rounded-lg">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-400 flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span> Coeficiente angular (a)</span>
+                        <span class="text-amber-400 font-mono font-bold" id="a-value">1.00</span>
+                    </div>
+                    <input type="range" id="a-slider" min="-3" max="3" step="0.05" value="1" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-amber-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                        <span>Decrescente (-3)</span>
+                        <span>Constante (0)</span>
+                        <span>Crescente (+3)</span>
+                    </div>
+                </div>
+
+                <!-- Coeficiente b (linear) -->
+                <div class="coef-highlight p-2 rounded-lg">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-400 flex items-center gap-1"><span class="w-3 h-3 rounded-full bg-emerald-400 inline-block"></span> Coeficiente linear (b)</span>
+                        <span class="text-emerald-400 font-mono font-bold" id="b-value">0.00</span>
+                    </div>
+                    <input type="range" id="b-slider" min="-5" max="5" step="0.1" value="0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500">
+                    <div class="flex justify-between text-[10px] text-slate-500 mt-0.5">
+                        <span>Para baixo (-5)</span>
+                        <span>Origem (0)</span>
+                        <span>Para cima (+5)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Análise gráfica -->
+            <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800/60 text-xs space-y-1.5">
+                <span class="font-medium text-slate-300 flex items-center gap-1.5"><i data-lucide="info" class="w-4 h-4"></i> Análise</span>
+                <div class="bg-slate-900/80 p-2 rounded-lg">
+                    <div id="analysis-text" class="text-slate-300 leading-relaxed">
+                        <span class="text-amber-400 font-semibold">a = 1.00</span> → função <span class="text-emerald-300">crescente</span><br>
+                        <span class="text-emerald-400 font-semibold">b = 0.00</span> → intercepta o eixo y na <span class="text-emerald-300">origem</span>
+                    </div>
+                </div>
+                <div class="flex justify-between text-[11px] text-slate-400">
+                    <span>Raiz: <span id="root-value" class="text-amber-300 font-mono">x = 0.00</span></span>
+                    <span>Ângulo: <span id="angle-value" class="text-amber-300 font-mono">45.0°</span></span>
+                </div>
+            </div>
+
+            <!-- Presets rápidos -->
+            <div class="bg-slate-950/50 p-3 rounded-xl border border-slate-800/60">
+                <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5"><i data-lucide="zap" class="w-3.5 h-3.5"></i> Exemplos rápidos</span>
+                <div class="grid grid-cols-4 gap-1.5 mt-2">
+                    <button onclick="setExample(1, 0)" class="preset-btn bg-slate-800 hover:bg-slate-700 py-1.5 px-1 rounded text-[10px] transition text-center font-medium">f(x)=x</button>
+                    <button onclick="setExample(2, 3)" class="preset-btn bg-slate-800 hover:bg-slate-700 py-1.5 px-1 rounded text-[10px] transition text-center font-medium">f(x)=2x+3</button>
+                    <button onclick="setExample(-1, 2)" class="preset-btn bg-slate-800 hover:bg-slate-700 py-1.5 px-1 rounded text-[10px] transition text-center font-medium">f(x)=-x+2</button>
+                    <button onclick="setExample(0, 4)" class="preset-btn bg-slate-800 hover:bg-slate-700 py-1.5 px-1 rounded text-[10px] transition text-center font-medium">f(x)=4</button>
+                </div>
+            </div>
+
+            <button id="reset-linear-btn" class="mt-1 bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700 text-sm py-2 rounded-xl flex items-center justify-center gap-2 transition">
+                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Resetar (f(x)=x)
+            </button>
+        </section>
+
+        <!-- ÁREA DE GRÁFICO (direita) -->
+        <section class="lg:col-span-8 flex flex-col gap-4">
+            <div class="relative bg-slate-950/80 rounded-2xl border border-slate-800/80 shadow-2xl overflow-hidden">
+                <div class="w-full h-[320px] md:h-[480px] relative">
+                    <canvas id="graphCanvas" class="w-full h-full block"></canvas>
+                </div>
+                <!-- Legendas flutuantes -->
+                <div class="absolute top-3 left-3 flex flex-wrap gap-2 text-[10px] bg-slate-900/80 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-700/50">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-400"></span> f(x)</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-400/70"></span> Raiz</span>
+                </div>
+                <div id="function-type" class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur text-xs px-3 py-1.5 rounded-lg border border-slate-700/50 font-medium text-amber-300">
+                    Crescente
+                </div>
+            </div>
+            <!-- Rodapé informativo -->
+            <div class="bg-slate-900/50 border border-slate-800/60 rounded-xl px-4 py-2 text-xs text-slate-400 flex flex-wrap items-center justify-between">
+                <span><i data-lucide="move" class="inline w-3.5 h-3.5 mr-1"></i> Use os sliders para explorar os coeficientes</span>
+                <span class="text-slate-500">|</span>
+                <span>Clique nos presets para exemplos rápidos</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-slate-800/60 py-4 px-4 mt-6 text-xs text-slate-500 text-center">
+        <p class="text-slate-400">Animação de funções lineares · Prof. Giovanelli</p>
+    </footer>
+
+    <script>
+        // ========== INICIALIZAÇÃO ==========
+        lucide.createIcons();
+
+        const canvas = document.getElementById('graphCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Controles
+        const aSlider = document.getElementById('a-slider');
+        const bSlider = document.getElementById('b-slider');
+        const aVal = document.getElementById('a-value');
+        const bVal = document.getElementById('b-value');
+        const aDisplay = document.getElementById('coef-a-display');
+        const bDisplay = document.getElementById('coef-b-display');
+        const bSign = document.getElementById('coef-b-sign');
+        const aLabel = document.getElementById('a-label');
+        const bLabel = document.getElementById('b-label');
+        const rootVal = document.getElementById('root-value');
+        const angleVal = document.getElementById('angle-value');
+        const analysisText = document.getElementById('analysis-text');
+        const functionType = document.getElementById('function-type');
+
+        const resetBtn = document.getElementById('reset-linear-btn');
+
+        // Estado
+        let state = {
+            a: 1.0,
+            b: 0.0,
+            animTime: 0,
+        };
+
+        // ========== REDIMENSIONAMENTO ==========
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+            drawGraph();
+        }
+        window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('load', () => {
+            resizeCanvas();
+            // loop de animação para o ponto móvel
+            function animLoop() {
+                state.animTime += 0.016;
+                drawGraph();
+                requestAnimationFrame(animLoop);
+            }
+            animLoop();
+        });
+
+        // ========== DESENHAR GRÁFICO ==========
+        function drawGraph() {
+            const w = canvas.width / (window.devicePixelRatio || 1);
+            const h = canvas.height / (window.devicePixelRatio || 1);
+
+            ctx.clearRect(0, 0, w, h);
+
+            // Margens
+            const margin = 50;
+            const graphW = w - 2 * margin;
+            const graphH = h - 2 * margin;
+
+            // Sistema de coordenadas: x e y variam de -6 a 6
+            const xMin = -6,
+                xMax = 6;
+            const yMin = -6,
+                yMax = 6;
+            const scaleX = graphW / (xMax - xMin);
+            const scaleY = graphH / (yMax - yMin);
+
+            // Função para converter coordenadas
+            function toCanvasX(x) { return margin + (x - xMin) * scaleX; }
+
+            function toCanvasY(y) { return margin + (yMax - y) * scaleY; }
+
+            // Fundo com grid
+            const grad = ctx.createRadialGradient(w / 2, h / 2, 50, w / 2, h / 2, 400);
+            grad.addColorStop(0, '#1e293b');
+            grad.addColorStop(1, '#0f172a');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, w, h);
+
+            // Grid
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 0.5;
+            for (let x = -6; x <= 6; x++) {
+                if (x === 0) continue;
+                const cx = toCanvasX(x);
+                ctx.beginPath();
+                ctx.moveTo(cx, margin);
+                ctx.lineTo(cx, h - margin);
+                ctx.stroke();
+            }
+            for (let y = -6; y <= 6; y++) {
+                if (y === 0) continue;
+                const cy = toCanvasY(y);
+                ctx.beginPath();
+                ctx.moveTo(margin, cy);
+                ctx.lineTo(w - margin, cy);
+                ctx.stroke();
+            }
+
+            // Eixos
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 1.5;
+            // Eixo X
+            const y0 = toCanvasY(0);
+            ctx.beginPath();
+            ctx.moveTo(margin, y0);
+            ctx.lineTo(w - margin, y0);
+            ctx.stroke();
+            // Eixo Y
+            const x0 = toCanvasX(0);
+            ctx.beginPath();
+            ctx.moveTo(x0, margin);
+            ctx.lineTo(x0, h - margin);
+            ctx.stroke();
+
+            // Setas dos eixos
+            ctx.fillStyle = '#64748b';
+            // Seta X
+            ctx.beginPath();
+            ctx.moveTo(w - margin + 5, y0);
+            ctx.lineTo(w - margin - 8, y0 - 5);
+            ctx.lineTo(w - margin - 8, y0 + 5);
+            ctx.closePath();
+            ctx.fill();
+            // Seta Y
+            ctx.beginPath();
+            ctx.moveTo(x0, margin - 5);
+            ctx.lineTo(x0 - 5, margin + 8);
+            ctx.lineTo(x0 + 5, margin + 8);
+            ctx.closePath();
+            ctx.fill();
+
+            // Labels dos eixos
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '11px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText('x', w - margin + 20, y0 + 16);
+            ctx.fillText('y', x0 + 16, margin - 8);
+
+            // Marcações dos eixos
+            ctx.font = '9px Inter';
+            ctx.fillStyle = '#64748b';
+            for (let x = -6; x <= 6; x++) {
+                if (x === 0) continue;
+                const cx = toCanvasX(x);
+                ctx.fillText(x, cx, y0 + 16);
+                ctx.beginPath();
+                ctx.moveTo(cx, y0 - 4);
+                ctx.lineTo(cx, y0 + 4);
+                ctx.stroke();
+            }
+            for (let y = -6; y <= 6; y++) {
+                if (y === 0) continue;
+                const cy = toCanvasY(y);
+                ctx.fillText(y, x0 - 18, cy + 4);
+                ctx.beginPath();
+                ctx.moveTo(x0 - 4, cy);
+                ctx.lineTo(x0 + 4, cy);
+                ctx.stroke();
+            }
+            ctx.fillText('0', x0 - 14, y0 + 16);
+
+            // ===== DESENHAR FUNÇÃO =====
+            const a = state.a;
+            const b = state.b;
+
+            // Pontos da função
+            ctx.strokeStyle = '#fbbf24';
+            ctx.lineWidth = 3;
+            ctx.shadowColor = '#fbbf24';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            let first = true;
+            for (let x = -6; x <= 6; x += 0.05) {
+                const y = a * x + b;
+                if (y < -6 || y > 6) {
+                    first = true;
+                    continue;
+                }
+                const cx = toCanvasX(x);
+                const cy = toCanvasY(y);
+                if (first) {
+                    ctx.moveTo(cx, cy);
+                    first = false;
+                } else {
+                    ctx.lineTo(cx, cy);
+                }
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+
+            // ===== PONTO MÓVEL ANIMADO =====
+            const t = state.animTime;
+            // Move o ponto ao longo da reta
+            const xMov = 5 * Math.sin(t * 0.6);
+            const yMov = a * xMov + b;
+            if (yMov >= -6 && yMov <= 6) {
+                const px = toCanvasX(xMov);
+                const py = toCanvasY(yMov);
+
+                // Glow
+                const gradPonto = ctx.createRadialGradient(px, py, 2, px, py, 20);
+                gradPonto.addColorStop(0, 'rgba(251, 191, 36, 0.8)');
+                gradPonto.addColorStop(1, 'rgba(251, 191, 36, 0)');
+                ctx.fillStyle = gradPonto;
+                ctx.beginPath();
+                ctx.arc(px, py, 20, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Ponto
+                ctx.fillStyle = '#fbbf24';
+                ctx.beginPath();
+                ctx.arc(px, py, 6, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Linha de projeção vertical (tracejada)
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.2)';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([4, 4]);
+                ctx.beginPath();
+                ctx.moveTo(px, py);
+                ctx.lineTo(px, y0);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // ===== RAÍZ DA FUNÇÃO =====
+            if (a !== 0) {
+                const rootX = -b / a;
+                if (rootX >= -6 && rootX <= 6) {
+                    const rx = toCanvasX(rootX);
+                    const ry = toCanvasY(0);
+
+                    // Círculo da raiz
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.beginPath();
+                    ctx.arc(rx, ry, 5, 0, 2 * Math.PI);
+                    ctx.fill();
+
+                    ctx.fillStyle = '#f43f5e';
+                    ctx.font = '10px Inter';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('Raiz', rx, ry - 14);
+                }
+            }
+
+            // ===== ANÁLISE VISUAL =====
+            // Ângulo de inclinação
+            const angleRad = Math.atan2(a, 1);
+            const angleDeg = (angleRad * 180 / Math.PI);
+
+            // Atualizar informações
+            const aStr = a.toFixed(2);
+            const bStr = b.toFixed(2);
+            aVal.textContent = aStr;
+            bVal.textContent = bStr;
+            aDisplay.textContent = aStr;
+            bDisplay.textContent = Math.abs(b).toFixed(2);
+            bSign.textContent = b >= 0 ? '+' : '-';
+            aLabel.textContent = `a = ${aStr}`;
+            bLabel.textContent = `b = ${bStr}`;
+
+            if (a !== 0) {
+                const root = -b / a;
+                rootVal.textContent = `x = ${root.toFixed(2)}`;
+            } else {
+                rootVal.textContent = b === 0 ? 'x ∈ ℝ' : 'sem raiz';
+            }
+            angleVal.textContent = `${angleDeg.toFixed(1)}°`;
+
+            // Análise textual
+            let analysis = '';
+            if (a > 0) {
+                analysis += `<span class="text-amber-400 font-semibold">a = ${aStr}</span> → função <span class="text-emerald-300">crescente</span><br>`;
+                functionType.textContent = 'Crescente';
+            } else if (a < 0) {
+                analysis += `<span class="text-amber-400 font-semibold">a = ${aStr}</span> → função <span class="text-rose-300">decrescente</span><br>`;
+                functionType.textContent = 'Decrescente';
+            } else {
+                analysis += `<span class="text-amber-400 font-semibold">a = ${aStr}</span> → função <span class="text-blue-300">constante</span><br>`;
+                functionType.textContent = 'Constante';
+            }
+
+            if (b > 0) {
+                analysis += `<span class="text-emerald-400 font-semibold">b = ${bStr}</span> → intercepta o eixo y em <span class="text-emerald-300">${bStr}</span> (acima da origem)`;
+            } else if (b < 0) {
+                analysis += `<span class="text-emerald-400 font-semibold">b = ${bStr}</span> → intercepta o eixo y em <span class="text-emerald-300">${bStr}</span> (abaixo da origem)`;
+            } else {
+                analysis += `<span class="text-emerald-400 font-semibold">b = ${bStr}</span> → intercepta o eixo y na <span class="text-emerald-300">origem (0,0)</span>`;
+            }
+            analysisText.innerHTML = analysis;
+
+            // ===== LEGENDA DO COEFICIENTE ANGULAR =====
+            // Mostrar visualmente a inclinação com um pequeno triângulo
+            if (a !== 0) {
+                const angulo = Math.atan(a);
+                const comprimento = 30;
+                const xBase = toCanvasX(0) + 50;
+                const yBase = toCanvasY(0) - 50;
+
+                ctx.save();
+                ctx.translate(xBase, yBase);
+                ctx.rotate(angulo);
+
+                // Linha de inclinação
+                ctx.strokeStyle = 'rgba(251, 191, 36, 0.3)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(comprimento, 0);
+                ctx.stroke();
+
+                // Triângulo
+                ctx.fillStyle = 'rgba(251, 191, 36, 0.2)';
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(comprimento, 0);
+                ctx.lineTo(comprimento, -comprimento * a * 0.3);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#94a3b8';
+                ctx.font = '8px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('a = ' + aStr, comprimento / 2, -comprimento * a * 0.15 - 6);
+                ctx.restore();
+            }
+        }
+
+        // ========== EVENTOS DOS SLIDERS ==========
+        function atualizarEstado() {
+            state.a = parseFloat(aSlider.value);
+            state.b = parseFloat(bSlider.value);
+        }
+
+        aSlider.addEventListener('input', () => {
+            atualizarEstado();
+        });
+        bSlider.addEventListener('input', () => {
+            atualizarEstado();
+        });
+
+        // ========== PRESETS RÁPIDOS ==========
+        function setExample(a, b) {
+            aSlider.value = a;
+            bSlider.value = b;
+            state.a = a;
+            state.b = b;
+        }
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            aSlider.value = 1;
+            bSlider.value = 0;
+            state.a = 1;
+            state.b = 0;
+        });
+
+        // ========== ANIMAÇÃO CONTÍNUA ==========
+        // O loop de animação já está rodando no load
+
+        // ========== INICIALIZAÇÃO FINAL ==========
+        atualizarEstado();
+    </script>
+</body>
+</html>
